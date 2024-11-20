@@ -1,9 +1,10 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render,HttpResponseRedirect
 from django.contrib import auth,messages #auth для входа/выхода, messages-для личных сообщений
 from users.models import User
 from users.forms import UserLoginForm, UserRegistrationForm,UserProfileForm
 from django.urls import reverse
-
+from products.models import Basket
 
 def login(request):
     if request.method == 'POST':# метод POST для ввода данных, GET для получения
@@ -33,7 +34,7 @@ def register(request):
     context = {'form':form}
     return render(request, 'users/register.html',context)
 
-
+@login_required
 def profile(request):
     if request.method == 'POST':
         form = UserProfileForm(instance=request.user,data=request.POST,files=request.FILES)#files для добавления файлов
@@ -47,6 +48,7 @@ def profile(request):
     context={
         'title':'Store - Профиль',
         'form':form,
+        'baskets':Basket.objects.filter(user=request.user),
     }
     return render(request, 'users/profile.html',context)
 
