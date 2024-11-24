@@ -1,29 +1,33 @@
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from products.models import Product, ProductCategory, Basket
 from users.models import User
+from django.views.generic.base import TemplateView
+from django.views.generic.list import ListView
+from common.views import TitleMixin
 
 
-def index(request):
-    context = {
-        'title': 'Store',
-    }
-    return render(request, 'products/index.html', context)
+class IndexView(TitleMixin, TemplateView):
+    template_name = 'products/index.html'
+    title = 'Store'
 
 
-def products(request, category_id=None, page=1):
-    products = Product.objects.filter(category_id=category_id) if category_id else Product.objects.all()
-    per_page = 3
-    paginator = Paginator(products, per_page)
-    products_paginator = paginator.page(page)  # передается номер стр которую надо отобразить
-    context = {
-        'title': 'Store - Каталог',
-        'products': products_paginator,
-        'categories': ProductCategory.objects.all(),
-    }
-    return render(request, 'products/products.html', context)
+class ProductsListView(TitleMixin,ListView):
+    model = Product
+    template_name = 'products/products.html'
+    paginate_by = 3
+    title = 'Store - Каталог'
+
+    def get_queryset(self):
+        queryset = super(ProductsListView, self).get_queryset()  # весь список объектов
+        category_id = self.kwargs.get(
+            'category_id')  # kwargs это словарик,в () чтобы передавать в случаи отст. категорий
+        return queryset.filter(category_id=category_id) if category_id else queryset
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductsListView, self).get_context_data()
+        context['categories'] = ProductCategory.objects.all()
+        return context
 
 
 @login_required
