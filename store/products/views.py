@@ -20,8 +20,8 @@ class ProductsListView(TitleMixin,ListView):
 
     def get_queryset(self):
         queryset = super(ProductsListView, self).get_queryset()  # весь список объектов
-        category_id = self.kwargs.get(
-            'category_id')  # kwargs это словарик,в () чтобы передавать в случаи отст. категорий
+        category_id = self.kwargs.get('category_id')
+        # kwargs это словарик,в () чтобы передавать в случаи отст. категорий
         return queryset.filter(category_id=category_id) if category_id else queryset
 
     def get_context_data(self, **kwargs):
