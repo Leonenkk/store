@@ -1,10 +1,9 @@
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
 from django import forms
-from users.models import EmailVerification
+from django.contrib.auth.forms import (AuthenticationForm, UserChangeForm,
+                                       UserCreationForm)
+
 from users.models import User
-import uuid
-from datetime import timedelta
-from django.utils.timezone import now
+from users.tasks import send_email_verification
 
 
 class UserLoginForm(AuthenticationForm):
@@ -44,10 +43,7 @@ class UserRegistrationForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super(UserRegistrationForm, self).save(commit=True)
-        expiration = now() + timedelta(hours=24)
-        code = uuid.uuid4()
-        record = EmailVerification.objects.create(user=user, expiration=expiration, code=code)
-        record.send_verification_email()
+        send_email_verification.delay(user.id)
         return user  # возвращаем пользователя чтобы сработал метод save
 
 

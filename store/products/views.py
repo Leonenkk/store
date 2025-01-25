@@ -1,10 +1,12 @@
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.http import HttpResponseRedirect
-from products.models import Product, ProductCategory, Basket
-from users.models import User
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
+
 from common.views import TitleMixin
+from products.models import Basket, Product, ProductCategory
+from users.models import User
 
 
 class IndexView(TitleMixin, TemplateView):
@@ -12,7 +14,7 @@ class IndexView(TitleMixin, TemplateView):
     title = 'Store'
 
 
-class ProductsListView(TitleMixin,ListView):
+class ProductsListView(TitleMixin, ListView):
     model = Product
     template_name = 'products/products.html'
     paginate_by = 3
@@ -26,7 +28,12 @@ class ProductsListView(TitleMixin,ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductsListView, self).get_context_data()
-        context['categories'] = ProductCategory.objects.all()
+        categories = cache.get('categories')
+        if not categories:
+            context['categories'] = ProductCategory.objects.all()
+            cache.set('categories', context['categories'], 120)
+        else:
+            context['categories'] = categories
         return context
 
 
