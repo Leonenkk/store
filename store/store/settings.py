@@ -22,19 +22,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=*k7i!(d8hs0)d0ceh*k+3at^6y!5to&99m$8&cdlgd4+ou)*^'
+SECRET_KEY =config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG =config('DEBUG')== 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS =config('ALLOWED_HOSTS',default='*').split(',')
 
 DOMAIN_NAME='http://localhost:8000'
 
-INTERNAL_IPS = [
-    '127.0.0.1',
-    'localhost',
-]
+INTERNAL_IPS = config('INTERNAL_IPS',default=' ').split(',')
 
 # Application definition
 
@@ -64,10 +61,10 @@ INSTALLED_APPS = [
 
 CACHES = {
     'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'BACKEND': config('CASHES_BACKEND'),
+        'LOCATION': config('CASHES_LOCATION'),
         'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'CLIENT_CLASS': config('CASHES_CLIENT_CLASS'),
         }
     }
 }
@@ -113,12 +110,12 @@ WSGI_APPLICATION = 'store.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'store_db',
-        'USER': 'store_username',
-        'PASSWORD': 'store_password',
-        'HOST': 'localhost',  # Или '127.0.0.1'
-        'PORT': '5432',
+        'ENGINE': config('DB_ENGINE'),
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),  # Или '127.0.0.1'
+        'PORT': config('DB_PORT'),
     }
 }
 
@@ -176,11 +173,11 @@ LOGOUT_REDIRECT_URL='/'
 
 #email
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT =int(config('EMAIL_POST'))
+EMAIL_USE_SSL =config('EMAIL_USE_SSL')=='TRUE'
 EMAIL_HOST_USER =config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD =config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_PASSWORD =config('EMAIL_HOST_USER')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN=EMAIL_HOST_USER
@@ -209,8 +206,8 @@ WEBHOOK_SECRET_KEY = config('WEBHOOK_SECRET_KEY')
 
 #CELERY
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL =config('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND =config('CELERY_RESULT_BACKEND')
 
 
 #DRF

@@ -16,7 +16,7 @@ class User(AbstractUser):  # наследуемся от существующе�
 
 
 class EmailVerification(models.Model):
-    code = models.UUIDField(unique=True, )
+    code = models.UUIDField(unique=True,)
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     expiration = models.DateTimeField()

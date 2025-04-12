@@ -41,7 +41,7 @@ class ProductsListView(TitleMixin, ListView):
 def basket_add(request, product_id):
     product_add = Product.objects.get(id=product_id)
     baskets = Basket.objects.filter(user=request.user, product=product_add)
-    # user=request.users-взять то что принадлежит конкретному пользователю
+    # user=request.users-взять то что принадлежит конкретном пользователю
     if not baskets.exists():
         Basket.objects.create(user=request.user, product=product_add, quantity=1)
     else:
